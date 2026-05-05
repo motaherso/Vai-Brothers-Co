@@ -41,8 +41,13 @@ const STORAGE_KEY = 'contact-nest-v1';
 
 export default function App() {
   const [contacts, setContacts] = useState<Contact[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : INITIAL_CONTACTS;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : INITIAL_CONTACTS;
+    } catch (e) {
+      console.error('Error loading contacts:', e);
+      return INITIAL_CONTACTS;
+    }
   });
 
   const saveToStorage = (newContacts: Contact[]) => {
