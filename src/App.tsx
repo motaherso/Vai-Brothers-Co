@@ -32,15 +32,7 @@ interface Contact {
   isFixed?: boolean;
 }
 
-const INITIAL_CONTACTS: Contact[] = [
-  { id: 'v1', name: 'মোঃ মোতাহার হোসেন (Admin)', mobile: '01758956571', isFixed: true },
-  { id: 'v2', name: 'Mst: Liza Akter', mobile: '01859565715', isFixed: true },
-  { id: 'v3', name: 'Mst: Jannatul', mobile: '01771642562', isFixed: true },
-  { id: 'v4', name: 'Md: Jashim Uddin', mobile: '01309532152', isFixed: true },
-  { id: 'v5', name: 'Md: Motahar', mobile: '01794638311', isFixed: true },
-  { id: 'v6', name: 'Md: Omar Faruk', mobile: '01700000000', isFixed: true },
-  { id: 'v7', name: 'Mst: Mim Akter', mobile: '01931232635', isFixed: true },
-];
+const INITIAL_CONTACTS: Contact[] = [];
 
 const STORAGE_KEY = 'contact-nest-v1';
 
@@ -48,7 +40,18 @@ export default function App() {
   const [contacts, setContacts] = useState<Contact[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : INITIAL_CONTACTS;
+      const savedContacts: Contact[] = saved ? JSON.parse(saved) : [];
+      
+      // Merge INITIAL_CONTACTS into saved contacts
+      // This ensures fixed contacts are always present and updated with latest code values
+      const merged = [...INITIAL_CONTACTS];
+      savedContacts.forEach(stored => {
+        // If it's not a fixed ID, add it to the list
+        if (!INITIAL_CONTACTS.some(fixed => fixed.id === stored.id)) {
+          merged.push(stored);
+        }
+      });
+      return merged;
     } catch (e) {
       console.error('Error loading contacts:', e);
       return INITIAL_CONTACTS;
