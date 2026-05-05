@@ -33,6 +33,10 @@ interface Contact {
 
 const INITIAL_CONTACTS: Contact[] = [
   { id: 'v1', name: 'মোঃ মোতাহার হোসেন (Admin)', mobile: '01913124000', isFixed: true },
+  { id: 'v2', name: 'Engg: Motaher Hossain', mobile: '01713625573', isFixed: true },
+  { id: 'v3', name: 'Md. Tariqul Islam', mobile: '01778595861', isFixed: true },
+  { id: 'v4', name: 'Md. Monir Hossain', mobile: '01714411112', isFixed: true },
+  { id: 'v5', name: 'Md. Saddam Hossain', mobile: '01341811241', isFixed: true },
 ];
 
 const STORAGE_KEY = 'contact-nest-v1';
@@ -51,7 +55,11 @@ export default function App() {
       
       const merged = [...INITIAL_CONTACTS];
       filteredSaved.forEach(stored => {
-        if (!INITIAL_CONTACTS.some(fixed => fixed.id === stored.id)) {
+        // Only add if not already in INITIAL_CONTACTS by ID AND not already in merged by Mobile number
+        const isDuplicateId = INITIAL_CONTACTS.some(fixed => fixed.id === stored.id);
+        const isDuplicateMobile = merged.some(m => m.mobile === stored.mobile);
+        
+        if (!isDuplicateId && !isDuplicateMobile) {
           merged.push(stored);
         }
       });
