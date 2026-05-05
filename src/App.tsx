@@ -33,8 +33,13 @@ interface Contact {
 }
 
 const INITIAL_CONTACTS: Contact[] = [
-  { id: 'v1', name: 'মোঃ মোতাহার হোসেন (Admin)', mobile: '01700000000', isFixed: true },
-  { id: 'v2', name: 'Vai Brothers Directory', mobile: '01800000000', isFixed: true },
+  { id: 'v1', name: 'মোঃ মোতাহার হোসেন (Admin)', mobile: '01758956571', isFixed: true },
+  { id: 'v2', name: 'Mst: Liza Akter', mobile: '01859565715', isFixed: true },
+  { id: 'v3', name: 'Mst: Jannatul', mobile: '01771642562', isFixed: true },
+  { id: 'v4', name: 'Md: Jashim Uddin', mobile: '01309532152', isFixed: true },
+  { id: 'v5', name: 'Md: Motahar', mobile: '01794638311', isFixed: true },
+  { id: 'v6', name: 'Md: Omar Faruk', mobile: '01700000000', isFixed: true },
+  { id: 'v7', name: 'Mst: Mim Akter', mobile: '01931232635', isFixed: true },
 ];
 
 const STORAGE_KEY = 'contact-nest-v1';
