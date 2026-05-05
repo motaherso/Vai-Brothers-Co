@@ -16,7 +16,6 @@ import {
   Check,
   ChevronRight,
   UserPlus,
-  Trash2,
   Share2,
   Camera,
   Image as ImageIcon,
@@ -32,7 +31,9 @@ interface Contact {
   isFixed?: boolean;
 }
 
-const INITIAL_CONTACTS: Contact[] = [];
+const INITIAL_CONTACTS: Contact[] = [
+  { id: 'v1', name: 'মোঃ মোতাহার হোসেন (Admin)', mobile: '01913124000', isFixed: true },
+];
 
 const STORAGE_KEY = 'contact-nest-v1';
 
@@ -150,13 +151,6 @@ export default function App() {
     const text = contacts.map(c => `${c.name}: ${c.mobile}`).join('\n');
     navigator.clipboard.writeText(text);
     alert('পুরো তালিকা কপি করা হয়েছে! এখন আপনি এটি যেকোনো জায়গায় শেয়ার করতে পারেন।');
-  };
-
-  const [idToDelete, setIdToDelete] = useState<string | null>(null);
-
-  const deleteContact = (id: string) => {
-    saveToStorage(contacts.filter(c => c.id !== id));
-    setIdToDelete(null);
   };
 
   const copyToClipboard = (id: string, text: string) => {
@@ -333,16 +327,6 @@ export default function App() {
                           <Edit2 className="h-3.5 w-3.5" />
                         </button>
                         <button
-                          id={`delete-${contact.id}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIdToDelete(contact.id);
-                          }}
-                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-90"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                        <button
                           id={`copy-${contact.id}`}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -487,50 +471,6 @@ export default function App() {
                   সংরক্ষণ করুন
                 </button>
               </form>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-        {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {idToDelete && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIdToDelete(null)}
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100]"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] bg-white rounded-[32px] p-8 z-[110] shadow-2xl text-center"
-            >
-              <div className="h-16 w-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Trash2 className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 bengali-text mb-2">মুছে ফেলতে চান?</h3>
-              <p className="text-slate-500 text-sm mb-8 bengali-text">এই নম্বরটি কন্টাক্ট লিস্ট থেকে চিরতরে মুছে যাবে।</p>
-              
-              <div className="flex gap-3">
-                <button
-                  id="cancel-delete"
-                  onClick={() => setIdToDelete(null)}
-                  className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl bengali-text active:scale-95 transition-all"
-                >
-                  না
-                </button>
-                <button
-                  id="confirm-delete"
-                  onClick={() => deleteContact(idToDelete)}
-                  className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl bengali-text shadow-lg shadow-red-200 active:scale-95 transition-all"
-                >
-                  হ্যাঁ, মুছুন
-                </button>
-              </div>
             </motion.div>
           </>
         )}
