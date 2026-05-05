@@ -42,11 +42,14 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       const savedContacts: Contact[] = saved ? JSON.parse(saved) : [];
       
-      // Merge INITIAL_CONTACTS into saved contacts
-      // This ensures fixed contacts are always present and updated with latest code values
+      // Filter out any previously fixed contacts (IDs starting with 'v') 
+      // if INITIAL_CONTACTS is empty, or ensure only current ones remain.
+      const filteredSaved = savedContacts.filter(stored => 
+        !stored.id.startsWith('v') || INITIAL_CONTACTS.some(fixed => fixed.id === stored.id)
+      );
+      
       const merged = [...INITIAL_CONTACTS];
-      savedContacts.forEach(stored => {
-        // If it's not a fixed ID, add it to the list
+      filteredSaved.forEach(stored => {
         if (!INITIAL_CONTACTS.some(fixed => fixed.id === stored.id)) {
           merged.push(stored);
         }
@@ -100,10 +103,17 @@ export default function App() {
   };
 
   const filteredContacts = useMemo(() => {
-    return contacts.filter(c => 
+    const filtered = contacts.filter(c => 
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       c.mobile.includes(searchQuery)
     );
+    
+    // Ensure fixed contacts are always at the top
+    return [...filtered].sort((a, b) => {
+      if (a.isFixed && !b.isFixed) return -1;
+      if (!a.isFixed && b.isFixed) return 1;
+      return 0;
+    });
   }, [contacts, searchQuery]);
 
   const handleSaveContact = (e: React.FormEvent) => {
@@ -202,82 +212,162 @@ export default function App() {
         </div>
 
         {/* Contact List */}
-        <div className="px-3 md:px-6 space-y-3 mt-8">
-        {filteredContacts.length > 0 ? (
-          filteredContacts.map((contact, index) => (
-            <motion.div
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.05 }}
-              key={contact.id}
-              className="glass-card p-3 md:p-4 rounded-2xl md:rounded-3xl flex items-center gap-3 md:gap-4 active:scale-[0.98] cursor-pointer group hover:bg-white transition-all shadow-sm shadow-slate-200/50"
-            >
-              <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 border border-blue-200 shadow-inner overflow-hidden flex-shrink-0">
-                {contact.image ? (
-                  <img src={contact.image} alt={contact.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                ) : (
-                  <CircleUser className="h-6 w-6 md:h-8 md:w-8" />
-                )}
-              </div>
-              
-              <div className="flex-1 min-w-0 flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-bold text-slate-900 text-base md:text-[17px] bengali-text group-hover:text-blue-600 transition-colors leading-tight break-words">
-                    {contact.name}
-                  </h3>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-black bg-blue-50 text-blue-700 border border-blue-100/50 w-fit tracking-tight">
-                    {contact.mobile}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <button
-                    id={`edit-${contact.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(contact);
-                    }}
-                    className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-white hover:text-blue-600 border border-transparent hover:border-slate-200 transition-all active:scale-90"
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </button>
-                  {!contact.isFixed && (
-                    <button
-                      id={`delete-${contact.id}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIdToDelete(contact.id);
-                      }}
-                      className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+        <div className="px-3 md:px-6 space-y-4 mt-8">
+          {filteredContacts.length > 0 ? (
+            <>
+              {/* Featured / Fixed Contacts Section */}
+              {filteredContacts.some(c => c.isFixed) && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 px-1 mb-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-70">প্রয়োজনীয় নম্বর / Admin</span>
+                  </div>
+                  {filteredContacts.filter(c => c.isFixed).map((contact, index) => (
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      key={contact.id}
+                      className="p-3 md:p-4 rounded-2xl md:rounded-3xl flex items-center gap-3 md:gap-4 active:scale-[0.98] cursor-pointer group bg-white border-2 border-blue-50 transition-all shadow-sm shadow-blue-100/50"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                      <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-blue-600 flex items-center justify-center text-white border border-blue-400 shadow-lg shadow-blue-200 overflow-hidden flex-shrink-0">
+                        {contact.image ? (
+                          <img src={contact.image} alt={contact.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        ) : (
+                          <User className="h-6 w-6 md:h-8 md:w-8" />
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 min-w-0 flex flex-col gap-2">
+                        <div className="flex flex-col gap-1">
+                          <h3 className="font-bold text-slate-900 text-base md:text-[17px] bengali-text group-hover:text-blue-600 transition-colors leading-tight break-words">
+                            {contact.name}
+                          </h3>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-black bg-blue-50 text-blue-700 border border-blue-100/50 w-fit tracking-tight">
+                            {contact.mobile}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            id={`edit-${contact.id}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(contact);
+                            }}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-white hover:text-blue-600 border border-transparent hover:border-slate-200 transition-all active:scale-90"
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            id={`copy-${contact.id}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyToClipboard(contact.id, contact.mobile);
+                            }}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100/50 text-slate-400 hover:bg-white hover:text-slate-900 transition-colors"
+                          >
+                            {copiedId === contact.id ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                          </button>
+                          <a
+                            id={`call-${contact.id}`}
+                            href={`tel:${contact.mobile}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-8 md:h-9 px-3 flex items-center justify-center gap-1 rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 text-[10px] font-black uppercase tracking-widest"
+                          >
+                            <Phone className="h-3 w-3" />
+                            <span className="hidden xs:inline">Call</span>
+                          </a>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {filteredContacts.some(c => !c.isFixed) && (
+                    <div className="pt-4 pb-2 border-t border-slate-100 flex items-center gap-2">
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">সাধারণ নম্বর / General</span>
+                    </div>
                   )}
-                  <button
-                    id={`copy-${contact.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      copyToClipboard(contact.id, contact.mobile);
-                    }}
-                    className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100/50 text-slate-400 hover:bg-white hover:text-slate-900 transition-colors"
-                  >
-                    {copiedId === contact.id ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
-                  </button>
-                  <a
-                    id={`call-${contact.id}`}
-                    href={`tel:${contact.mobile}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="h-8 md:h-9 px-3 flex items-center justify-center gap-1 rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95 text-[10px] font-black uppercase tracking-widest"
-                  >
-                    <Phone className="h-3 w-3" />
-                    <span className="hidden xs:inline">Call</span>
-                  </a>
                 </div>
+              )}
+
+              {/* General Contacts Section */}
+              <div className="space-y-3">
+                {filteredContacts.filter(c => !c.isFixed).map((contact, index) => (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    key={contact.id}
+                    className="glass-card p-3 md:p-4 rounded-2xl md:rounded-3xl flex items-center gap-3 md:gap-4 active:scale-[0.98] cursor-pointer group hover:bg-white transition-all shadow-sm shadow-slate-200/50"
+                  >
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 border border-blue-200 shadow-inner overflow-hidden flex-shrink-0">
+                      {contact.image ? (
+                        <img src={contact.image} alt={contact.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <CircleUser className="h-6 w-6 md:h-8 md:w-8" />
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0 flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-bold text-slate-900 text-base md:text-[17px] bengali-text group-hover:text-blue-600 transition-colors leading-tight break-words">
+                          {contact.name}
+                        </h3>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-black bg-blue-50 text-blue-700 border border-blue-100/50 w-fit tracking-tight">
+                          {contact.mobile}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          id={`edit-${contact.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(contact);
+                          }}
+                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-white hover:text-blue-600 border border-transparent hover:border-slate-200 transition-all active:scale-90"
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          id={`delete-${contact.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIdToDelete(contact.id);
+                          }}
+                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          id={`copy-${contact.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(contact.id, contact.mobile);
+                          }}
+                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100/50 text-slate-400 hover:bg-white hover:text-slate-900 transition-colors"
+                        >
+                          {copiedId === contact.id ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                        </button>
+                        <a
+                          id={`call-${contact.id}`}
+                          href={`tel:${contact.mobile}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-8 md:h-9 px-3 flex items-center justify-center gap-1 rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95 text-[10px] font-black uppercase tracking-widest"
+                        >
+                          <Phone className="h-3 w-3" />
+                          <span className="hidden xs:inline">Call</span>
+                        </a>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </motion.div>
-          ))
-        ) : (
+            </>
+          ) : (
           <div className="text-center py-20 opacity-50 space-y-4">
             <div className="h-16 w-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto">
                <Search className="h-8 w-8" />
