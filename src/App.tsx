@@ -29,12 +29,12 @@ interface Contact {
   mobile: string;
   tag?: string;
   image?: string;
+  isFixed?: boolean;
 }
 
 const INITIAL_CONTACTS: Contact[] = [
-  { id: '1', name: 'রহিম আহমেদ', mobile: '01712345678', tag: 'পরিবার' },
-  { id: '2', name: 'কারিমা বেগম', mobile: '01812345678', tag: 'বন্ধু' },
-  { id: '3', name: 'সুমন দাস', mobile: '01912345678', tag: 'অফিস' },
+  { id: 'v1', name: 'মোঃ মোতাহার হোসেন (Admin)', mobile: '01700000000', isFixed: true },
+  { id: 'v2', name: 'Vai Brothers Directory', mobile: '01800000000', isFixed: true },
 ];
 
 const STORAGE_KEY = 'contact-nest-v1';
@@ -213,9 +213,9 @@ export default function App() {
                 )}
               </div>
               
-              <div className="flex-1 min-w-0 flex flex-col gap-3">
+              <div className="flex-1 min-w-0 flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
-                  <h3 className="font-bold text-slate-900 text-base md:text-[17px] bengali-text group-hover:text-blue-600 transition-colors leading-tight">
+                  <h3 className="font-bold text-slate-900 text-base md:text-[17px] bengali-text group-hover:text-blue-600 transition-colors leading-tight break-words">
                     {contact.name}
                   </h3>
                   <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-black bg-blue-50 text-blue-700 border border-blue-100/50 w-fit tracking-tight">
@@ -234,16 +234,18 @@ export default function App() {
                   >
                     <Edit2 className="h-3.5 w-3.5" />
                   </button>
-                  <button
-                    id={`delete-${contact.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIdToDelete(contact.id);
-                    }}
-                    className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-90"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  {!contact.isFixed && (
+                    <button
+                      id={`delete-${contact.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIdToDelete(contact.id);
+                      }}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                   <button
                     id={`copy-${contact.id}`}
                     onClick={(e) => {
@@ -258,10 +260,10 @@ export default function App() {
                     id={`call-${contact.id}`}
                     href={`tel:${contact.mobile}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="h-8 w-14 flex items-center justify-center gap-1 px-3 rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95 text-[10px] font-black uppercase tracking-widest"
+                    className="h-8 md:h-9 px-3 flex items-center justify-center gap-1 rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95 text-[10px] font-black uppercase tracking-widest"
                   >
                     <Phone className="h-3 w-3" />
-                    <span>Call</span>
+                    <span className="hidden xs:inline">Call</span>
                   </a>
                 </div>
               </div>
