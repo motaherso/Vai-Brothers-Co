@@ -37,6 +37,11 @@ const INITIAL_CONTACTS: Contact[] = [
   { id: 'v3', name: 'Md. Tariqul Islam', mobile: '01778595861', isFixed: true },
   { id: 'v4', name: 'Md. Monir Hossain', mobile: '01714411112', isFixed: true },
   { id: 'v5', name: 'Md. Saddam Hossain', mobile: '01341811241', isFixed: true },
+  { id: 'v6', name: 'Mst: Liza Akter', mobile: '01859565715', isFixed: true },
+  { id: 'v7', name: 'Mst: Jannatul', mobile: '01771642562', isFixed: true },
+  { id: 'v8', name: 'Md: Jashim Uddin', mobile: '01309532152', isFixed: true },
+  { id: 'v9', name: 'Md: Omar Faruk', mobile: '01700000000', isFixed: true },
+  { id: 'v10', name: 'Mst: Mim Akter', mobile: '01931232635', isFixed: true },
 ];
 
 const STORAGE_KEY = 'contact-nest-v1';
