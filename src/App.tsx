@@ -172,6 +172,12 @@ export default function App() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const copyAllData = () => {
+    const data = JSON.stringify(contacts.map(c => ({ name: c.name, mobile: c.mobile, isFixed: true })), null, 2);
+    navigator.clipboard.writeText(data);
+    alert('সকল নাম ও নম্বর কপি করা হয়েছে! এই টেক্সটটি কপি করে আমাকে (AI-কে) মেসেজ দিন যাতে আমি অ্যাপটি স্থায়ীভাবে আপডেট করতে পারি।');
+  };
+
   return (
     <div className="min-h-screen bg-blue-600 md:py-8 font-sans">
       <div className="max-w-md mx-auto h-full min-h-screen md:min-h-[850px] bg-slate-50 relative overflow-hidden md:rounded-[3rem] md:shadow-2xl md:border-8 md:border-blue-700 shadow-blue-900/40 pb-24">
@@ -490,7 +496,14 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="mt-12 mb-28 text-center opacity-30 select-none px-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] font-black text-slate-400">Contact Nest Directory</p>
+          <p className="text-[10px] uppercase tracking-[0.3em] font-black text-slate-400">Contact Nest Directory v1.2</p>
+          <button 
+            id="admin-export-data"
+            onClick={copyAllData}
+            className="mt-4 text-[9px] font-bold text-blue-600 hover:opacity-100 opacity-40 transition-opacity cursor-pointer border border-blue-200 px-3 py-1 rounded-full uppercase tracking-tighter"
+          >
+            Copy Data for AI Update
+          </button>
         </footer>
       </div>
     </div>
